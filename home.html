@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的个人网站</title>
+    <link rel="stylesheet" href="https://static.fontawesome.com/css/fontawesome-app.css">
+    <!-- 引入字体图标 -->
+    <link rel="stylesheet" href="./font/iconfont.css">
+    <!-- 引入字体 -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400&display=swap">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            font-family: "Source Sans Pro", sans-serif;
+        }
+
+        div {
+            caret-color: transparent;
+        }
+
+        /* 搜索框样式 */
+        .search-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 2px solid #fff;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 16px;
+            width: 200px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-input:focus {
+            width: 250px;
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        .search-btn {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            margin-left: 10px;
+            text-shadow: 0 0 10px #ffffff;
+        }
+
+        /* 设置html和body元素为flex布局，水平和垂直居中对齐，高度为100vh，背景图大小为cover，溢出隐藏，背景图过渡动画时间为0.7秒 */
+        html,
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-size: cover;
+            overflow: hidden;
+            transition: background-image .7s ease-in-out;
+        }
+        
+        /* 设置.shell元素为相对定位，flex布局，水平和垂直居中对齐，宽度和高度为100%，盒模型为border-box，背景颜色为rgba(99, 99, 99, 0.8) */
+        .shell {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            background: rgba(99, 99, 99, 0.8);
+        }
+
+        /* 设置.button元素为flex布局，两端对齐，宽度为380px，绝对定位，左侧偏移量为50%，水平居中，底部偏移量为-80px */
+        .button {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 380px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: -80px;
+        }
+
+        /* 设置.prev和.next元素过渡动画时间为0.25秒，层级为99999，底部偏移量为5px */
+        .prev,
+        .next {
+            transition: transform 0.25s ease;
+            z-index: 99999;
+            bottom: 5px;
+        }
+
+        /* 设置.prev和.next元素中的i元素字体大小为90px，颜色为#fff，光标为指针，文字阴影为0 0 10px #ffffff */
+        .prev i,
+        .next i {
+            font-size: 90px;
+            color: #fff;
+            cursor: pointer;
+            text-shadow: 0 0 10px #ffffff;
+        }
+
+        /* 设置.shell_body元素宽度为100%，缩放为0.8倍，上内边距为20px，下内边距为150px */
+        .shell_body {
+            width: 100%;
+            transform: scale(.8);
+            padding: 20px 0 150px 0;
+        }
+
+        /* 设置.shell_slider元素为相对定位，过渡动画时间为1秒，背景为透明 */
+        .shell_slider {
+            position: relative;
+            transition: transform 1s ease-in-out;
+            background: transparent;
+        }
+
+        /* 设置.item元素为相对定位，左浮动，左右外边距为20px */
+        .item {
+            position: relative;
+            float: left;
+            margin: 0 20px;
+        }
+
+        /* 设置.frame元素为相对定位，宽度和高度为100%，过渡动画时间为1秒，3D变换模式为保留3D效果 */
+        .frame {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 1s ease-in-out;
+            transform-style: preserve-3d;
+        }
+
+        /* 设置.frame元素的伪元素为绝对定位，底部偏移量为-16%，宽度为100%，高度为60px，背景颜色为#ffffff1c，盒阴影为0px 0px 15px 5px #ffffff1c，3D变换为绕X轴旋转90度并向上平移20px */
+        .frame:after {
+            content: "";
+            position: absolute;
+            bottom: -16%;
+            width: 100%;
+            height: 60px;
+            background: #ffffff1c;
+            box-shadow: 0px 0px 15px 5px #ffffff1c;
+            transform: rotateX(90deg) translate3d(0px, -20px, 0px);
+        }
+
+        /* 设置.box元素为flex布局，纵向排列，水平和垂直居中对齐，绝对定位，宽度和高度为100%，边框为4px实心白色，透视效果为1000px，3D变换模式为保留3D效果 */
+        .box {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid #fff;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        /* 设置.box元素中的h1和span元素颜色为#fff，Z轴平移距离为20px */
+        .box h1,
+        .box span {
+            color: #fff;
+            transform: translateZ(20px);
+        }
+
+        /* 设置.box元素中的h1元素文字阴影为0 0 30px #1f05b4，字体大小为100px */
+        .box h1 {
+            text-shadow: 0 0 30px #1f05b4;
+            font-size: 100px;
+        }
+
+        /* 设置.box元素中的span元素为绝对定位，底部偏移量为20px，左右内边距为25px，文字阴影为0 0 10px #1f05b4 */
+        .box span {
+            position: absolute;
+            bottom: 20px;
+            padding: 0 25px;
+            text-shadow: 0 0 10px #1f05b4;
+        }
+
+        /* 设置.front、.left和.right元素的盒阴影为0 0 50px #ffffff，背景图大小为cover */
+        .front,
+        .left,
+        .right {
+            box-shadow: 0 0 50px #ffffff;
+            background-size: cover;
+        }
+
+        /* 设置.left和.right元素的顶部偏移量为0，宽度为60px，背面不可见 */
+        .right,
+        .left {
+            top: 0;
+            width: 60px;
+            backface-visibility: hidden;
+        }
+
+        /* 设置.left元素的左侧偏移量为0，左边框宽度为5px，3D变换为向右平移1px，Z轴平移-60px，绕Y轴逆时针旋转90度，变换原点为左侧 */
+        .left {
+            left: 0;
+            border-left-width: 5px;
+            transform: translate3d(1px, 0, -60px) rotateY(-90deg);
+            transform-origin: 0%;
+        }
+
+        /* 设置.right元素的右侧偏移量为0，右边框宽度为5px，3D变换为向左平移1px，Z轴平移-60px，绕Y轴顺时针旋转90度，变换原点为右侧 */
+        .right {
+            right: 0;
+            border-right-width: 5px;
+            transform: translate3d(-1px, 0, -60px) rotateY(90deg);
+            transform-origin: 100%;
+        }
+
+        .iconfont {
+            color: rgb(24, 148, 127);
+        }
+
+        .icon-backward_filled:before {
+            content: "\2190";
+            font-size: 90px;
+            /* 调整大小 */
+            /* color: rgb(0, 17, 255); 调整颜色 */
+            transition-duration: 4s;
+            /* 添加过渡效果 */
+        }
+
+        .icon-backward_filled:hover:before {
+            font-size: 130px;
+        }
+
+        .icon-forward_filled:after {
+            content: "\2192";
+            font-size: 90px;
+            /* 调整大小 */
+            transition-duration: 4s;
+        }
+
+        .icon-forward_filled:hover:after {
+            font-size: 130px;
+            /* 添加过渡效果 */
+        }
+
+        #music_name {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            top: 85vh;
+            align-items: center;
+            /* transform: translate(-50%,-50%); */
+            color: #fff;
+            font-size: 45px;
+            text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 40px #fff, 0 0 80px #fff, 0 0 90px #fff, 0 0 100px #fff, 0 0 150px #fff;
+        }
+
+        .music_container {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            /* box-shadow: 0 0 50px #ffffff; */
+            border-radius: 50%;
+            transition: transform 0.5s ease;
+        }
+
+        .music_jpg {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            /* box-shadow: 0 0 50px #ffffff; */
+            background-size: cover;
+            background-color: transparent;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 50%;
+            animation: rotate 5s linear infinite;
+            animation-play-state: paused;
+            transition: transform 0.5s ease;
+
+        }
+
+        .music_container:hover {
+            transform: scale(1.8);
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+
+        }
+    </style>
+    <link rel="icon" href="./img/01.ico" sizes="32x32">
+    <link rel="shortcut icon" href="./img/01.ico" sizes="32x32">
+</head>
+
+<body>
+    <audio id="music" controls>
+        <!-- <source src="./music/All My Life - Wild.flac" type="audio/flac">
+        <source src="./music/I Wanna Be In The Cavalry - Seth Staton Watkins.flac" type="audio/flac">
+        <source src="./music/If I Die Young - The Band Perry.flac" type="audio/flac"> -->
+    </audio>
+    
+    <!-- 搜索框 -->
+    <div class="search-container">
+        <input type="text" class="search-input" id="searchInput" placeholder="搜索内容...">
+        <button class="search-btn" id="searchBtn">🔍</button>
+    </div>
+    
+    <div class="shell">
+        <div class="shell_body">
+            <div class="button">
+                <div class="prev"><i class="iconfont icon-backward_filled"></i></div>
+                <div class="next"><i class="iconfont icon-forward_filled"></i></div>
+            </div>
+
+            <div class="shell_slider">
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>游戏</h1>
+                            <span>自制的网页端小游戏😎😎😎，希望您能从中获得乐趣</span>
+                        </div>
+                        
+
+                        <div class="box left"></div>
+                        <div class="box right"> </div>
+
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>盾斧</h1>
+                            <span>盾斧玩家太有实力了，他们是容光焕发的英雄，并且常常自信从容😎😎😎</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"> </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>工具</h1>
+                            <span>收录了一些自制小工具😎😎😎</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"></div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>音乐</h1>
+                            <span>收容了一些个人喜欢的音乐😎😎😎</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"> </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>国外</h1>
+                            <span>不到啊，可能会给干到国外吧😨</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"> </div>
+                    </div>
+                </div>
+                <!-- <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>2019</h1>
+                            <span>-In the year 2019 I reached the age of 18-</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"> </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>2020</h1>
+                            <span>-In the year 2020 I reached the age of 18-</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"> </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>2021</h1>
+                            <span>-In the year 2021 I reached the age of 19-</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"> </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>2022</h1>
+                            <span>-In the year 2022 I reached the age of 20-</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"> </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="frame">
+                        <div class="box front">
+                            <h1>2023</h1>
+                            <span>-In the year 2023 I reached the age of 21-</span>
+                        </div>
+                        <div class="box left"></div>
+                        <div class="box right"> </div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+    <div class="music_container">
+        <div class="music_jpg"></div>
+    </div>
+    <div class="music_container">
+        <div class="music_jpg"></div>
+    </div>
+    <p id="music_name">das</p>
+    <!-- <button id="qqq">qqqq</button> -->
+</body>
+<script>
+    // 这段JavaScript代码的作用是实现一个图片轮播效果。首先，通过document.getElementsByClassName('item')获取到所有具有item类名的元素，并将它们存储在items变量中。
+    // 然后，通过一个循环遍历每个item元素。在循环中，首先获取当前的item元素，然后通过getElementsByClassName方法获取到该item下的frame、front、left和right元素，并将它们分别存储在frame、frontBox、leftBox和rightBox变量中。
+    // 接下来，通过设置frontBox、leftBox和rightBox的style.backgroundImage属性，将背景图片设置为'url(./img/' + (i + 1).toString().padStart(2, '0') + '.jpg)'，其中(i + 1).toString().padStart(2, '0')表示将循环变量i加1后转换为字符串，并在前面补0，以保证图片的文件名格式正确。
+    // 接着，定义了一个立即执行函数，并在函数内部进行了一些操作。首先，通过document.getElementsByClassName('shell')[0]获取到具有shell类名的元素，并将其存储在shell变量中。然后，通过shell.getElementsByClassName方法获取到该shell元素下的shell_slider、item、prev和next元素，并将它们分别存储在slider、items、prevBtn和nextBtn变量中。
+    // 接下来，定义了一些变量，包括width、height、totalWidth、margin、currIndex、interval和intervalTime。width和height分别表示每个item的宽度和高度，totalWidth表示所有item的总宽度，margin表示item的外边距，currIndex表示当前显示的item的索引，interval表示定时器的ID，intervalTime表示定时器的时间间隔。
+    // 然后，定义了init函数，该函数用于初始化一些操作。在该函数中，首先调用resize函数调整大小，然后调用move函数将显示的item移动到中间位置，接着调用bindEvents函数绑定事件，最后调用timer函数启动定时器。
+    // 接着，定义了resize函数，该函数用于在窗口大小变化时调整大小。在该函数中，首先计算出新的width和height，然后根据计算结果设置slider的宽度，以及每个item的宽度和高度。
+    // 接下来，定义了bindEvents函数，该函数用于绑定事件。在该函数中，首先绑定了窗口大小变化时调用resize函数的事件，然后绑定了点击prev按钮和next按钮时调用prev函数和next函数的事件。
+    // 最后，在立即执行函数的末尾，调用了init函数来初始化页面，并定义了move、timer、prev和next函数。其中，move函数用于移动shell到指定的item，timer函数用于启动定时器，prev函数用于切换到上一个item，next函数用于切换到下一个item。
+
+    //在这里更改每个item的链接依次从前到后链接各个item。
+    var linklist = ['https://nidiqindie.github.io/my_game/#/', './c2.html', 'https://nidiqindie.github.io/my_tool/#/home', './c4.html', './c5.html'];
+    var musiclist = ["./music/All My Life - Wild.flac",
+                     "./music/I Wanna Be In The Cavalry - Seth Staton Watkins.flac", 
+                     "./music/If I Die Young - The Band Perry.flac"
+                     ];
+    // 获取所有的item元素
+    var items = document.getElementsByClassName('item');
+
+    //获取music
+    var music = document.getElementById('music');
+
+    //获取music按钮的jpg
+    var music_jpg = document.getElementsByClassName('music_jpg')[0];
+    var music_jpg2 = document.getElementsByClassName('music_jpg')[1];
+
+    //获取music按钮框架
+    var music_container = document.getElementsByClassName('music_container')[0];
+    var music_container2 = document.getElementsByClassName('music_container')[1];
+
+    //获取当前音乐的name
+    var music_name = document.getElementById('music_name');
+     var music_now_name;
+    //当前播放歌曲的index
+    var currentSongIndex = 0;
+
+    // 循环遍历每个item
+    for (var i = 0; i < items.length; i++) {
+        // 获取当前item
+        var item = items[i];
+        var frame = item.getElementsByClassName('frame')[0];
+        var frontBox = frame.getElementsByClassName('front')[0];
+        var leftBox = frame.getElementsByClassName('left')[0];
+        var rightBox = frame.getElementsByClassName('right')[0];
+        //定义一个新的链接
+        var link = document.createElement('a');
+        // 设置<a>元素的href属性
+        link.setAttribute('href',  linklist[i]);
+        // 设置<a>元素的target属性（如果需要在新标签页打开）
+        link.setAttribute('target', '_blank');
+        frame.appendChild(link);
+        // link.appendChild(frame);
+        link.appendChild(frontBox);
+        // link.appendChild(leftBox);
+        // link.appendChild(rightBox);
+
+        // 设置背景图片
+        frontBox.style.backgroundImage = 'url(./img/' + (i + 1).toString().padStart(2, '0') + '.jpg)';
+        leftBox.style.backgroundImage = 'url(./img/' + (i + 1).toString().padStart(2, '0') + '.jpg)';
+        rightBox.style.backgroundImage = 'url(./img/' + (i + 1).toString().padStart(2, '0') + '.jpg)';
+    }
+    music_jpg.style.backgroundImage = "url(./img/music.svg)";
+     music_jpg2.style.backgroundImage = "url(./img/music2.svg)";
+    (function () {
+        "use strict";
+        var shell = document.getElementsByClassName('shell')[0];
+        var slider = shell.getElementsByClassName('shell_slider')[0];
+        var items = shell.getElementsByClassName('item');
+        var prevBtn = shell.getElementsByClassName('prev')[0];
+        var nextBtn = shell.getElementsByClassName('next')[0];
+        // 定义变量
+        var width, height, totalWidth, margin = 20,
+            currIndex = 0,
+            interval, intervalTime = 3000;
+        function init() {
+            // 初始化函数
+            resize();
+            move(Math.floor(items.length / 2));
+            bindEvents();
+            timer();
+        }
+
+        // 当前播放的歌曲索引
+       
+        function playNextSong() {
+            // alert('播放下一首歌曲');
+            if (currentSongIndex < musiclist.length - 1) {
+                currentSongIndex++;
+            } else {
+                // 如果已经播放到最后一首歌，重新开始
+                currentSongIndex = 0;
+            }
+            console.log(currentSongIndex);
+            // 播放下一首歌
+            music.src = musiclist[currentSongIndex];
+             music_now_name = musiclist[currentSongIndex].split('/').pop().split('.')[0];
+            music_name.innerHTML = "<i>" + music_now_name + "</i>"
+            music.load();
+            music.play();
+        }
+        function resize() {
+            // 窗口大小变化时调整大小
+            width = Math.max(window.innerWidth * .20, 275);
+            height = window.innerHeight * .5;
+            totalWidth = width * items.length;
+            // 设置slider宽度
+            slider.style.width = totalWidth + "px";
+            // 设置每个item的宽度和高度
+            for (var i = 0; i < items.length; i++) {
+                let item = items[i];
+                item.style.width = (width - (margin * 2)) + "px";
+                item.style.height = height + "px";
+            }
+            music.src = musiclist[0];
+            music_container.style.left = window.innerWidth * 0.05 + 'px';
+            music_container.style.bottom = window.innerHeight * 0.05 + 'px';
+            music_container2.style.right= window.innerWidth * 0.05 + 'px';
+            music_container2.style.bottom = window.innerHeight * 0.05 + 'px';
+            music_name.innerHTML = "<i>未播放歌曲</i>"
+        }
+        function bindEvents() {
+            //自动切歌
+            music.onended = playNextSong;
+            // document.getElementById('qqq').onclick = playNextSong;
+            // 窗口大小变化时调整大小
+            window.onresize = resize;
+            //首页播放音乐的按钮
+            music_container.addEventListener('click', () => { play_music(); })
+            music_container2.addEventListener('click', () => { playNextSong(); })
+            // 点击prev按钮切换item
+            prevBtn.addEventListener('click', () => { prev(); });
+            nextBtn.addEventListener('click', () => { next(); });
+        }
+        init();
+        let count_time = 0;
+        function play_music() {
+            if (count_time == 0) {
+                music_now_name = musiclist[currentSongIndex].split('/').pop().split('.')[0];
+                music.play();
+                count_time = 1;
+                music_name.innerHTML=music_now_name;
+                music_jpg.style.animationPlayState = "running";
+            }
+            else if (count_time == 1) {
+                music.pause();
+                count_time = 2;
+                music_jpg.style.animationPlayState = "paused";
+            }
+            else
+            {
+                count_time = 1;
+                music.play();
+                music_jpg.style.animationPlayState = "running";
+            }
+
+        }
+        function move(index) {
+            // 移动shell到指定的item
+            if (index < 1) index = items.length;
+            if (index > items.length) index = 1;
+            currIndex = index;
+            // 遍历所有item
+            for (var i = 0; i < items.length; i++) {
+                let item = items[i],
+                    box = item.getElementsByClassName('frame')[0];
+                if (i == (index - 1)) {
+                    // 当前item添加active类并设置3D效果
+                    item.classList.add('item--active');
+                    box.style.transform = "perspective(1200px)";
+                } else {
+                    // 其他item移除active类并设置3D效果
+                    item.classList.remove('item--active');
+                    box.style.transform = "perspective(1200px) rotateY(" + (i < (index - 1) ? 40 : -40) + "deg)";
+                }
+            }
+            // 移动slider
+            slider.style.transform = "translate3d(" + ((index * -width) + (width / 2) + window.innerWidth / 2) + "px, 0, 0)";
+            // 设置body背景图片
+            var frontBox = items[index - 1].getElementsByClassName('front')[0];
+            document.body.style.backgroundImage = frontBox.style.backgroundImage;
+        }
+        function timer() {
+            // 定时器，自动切换shell
+            clearInterval(interval);
+            interval = setInterval(() => {
+                move(++currIndex);
+            }, intervalTime);
+        }
+        // 切换item
+        function prev() {
+            move(--currIndex);
+            timer();
+        }
+        function next() {
+            move(++currIndex);
+            timer();
+        }
+    })();
+
+    // 搜索功能实现
+    document.getElementById('searchBtn').addEventListener('click', performSearch);
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+
+    function performSearch() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        if (!searchTerm) return;
+        
+        let found = false;
+        const allItems = document.getElementsByClassName('item');
+        
+        // 遍历所有卡片内容
+        for (let i = 0; i < allItems.length; i++) {
+            const item = allItems[i];
+            const title = item.querySelector('h1').textContent.toLowerCase();
+            const description = item.querySelector('span').textContent.toLowerCase();
+            
+            // 如果找到匹配内容
+            if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                found = true;
+                
+                // 直接跳转到对应链接，不再尝试移动卡片
+                if (linklist[i]) {
+                    window.open(linklist[i], '_blank');
+                }
+                
+                break;
+            }
+        }
+        
+        // 如果没找到匹配内容
+        if (!found) {
+            alert('未找到相关内容');
+        }
+    }
+
+    // 定义全局move函数，供搜索功能使用
+    function move(index) {
+        // 移动shell到指定的item
+        if (index < 1) index = items.length;
+        if (index > items.length) index = 1;
+        currIndex = index;
+        // 遍历所有item
+        for (var i = 0; i < items.length; i++) {
+            let item = items[i],
+                box = item.getElementsByClassName('frame')[0];
+            if (i == (index - 1)) {
+                // 当前item添加active类并设置3D效果
+                item.classList.add('item--active');
+                box.style.transform = "perspective(1200px)";
+            } else {
+                // 其他item移除active类并设置3D效果
+                item.classList.remove('item--active');
+                box.style.transform = "perspective(1200px) rotateY(" + (i < (index - 1) ? 40 : -40) + "deg)";
+            }
+        }
+        // 移动slider
+        slider.style.transform = "translate3d(" + ((index * -width) + (width / 2) + window.innerWidth / 2) + "px, 0, 0)";
+        // 设置body背景图片
+        var frontBox = items[index - 1].getElementsByClassName('front')[0];
+        document.body.style.backgroundImage = frontBox.style.backgroundImage;
+    }
+</script>
+
+</html>
